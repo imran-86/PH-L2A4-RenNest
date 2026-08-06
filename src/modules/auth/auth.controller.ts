@@ -11,7 +11,7 @@ import { authService } from "./auth.service";
 const loginUser = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const payload = req.body;
 
-    const {accessToken, refreshToken} = await authService.loginUser(payload);
+    const {accessToken, refreshToken,id,name,email,role} = await authService.loginUser(payload);
 
     console.log("Access Token : ", accessToken);
     console.log("Refresh Token : ", refreshToken);
@@ -34,7 +34,7 @@ const loginUser = catchAsync(async (req : Request, res : Response, next : NextFu
         success: true,
         statusCode: httpStatus.OK,
         message: "User logged in successfully",
-        data: { accessToken, refreshToken }
+        data: { accessToken, refreshToken , id,name,email,role}
     });
 });
 export const authController = {

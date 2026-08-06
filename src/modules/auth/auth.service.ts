@@ -46,7 +46,11 @@ const loginUser = async (payload : ILoginUser) => {
 
     return {
         accessToken,
-        refreshToken
+        refreshToken,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
     };
 }
 

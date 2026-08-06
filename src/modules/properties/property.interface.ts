@@ -1,0 +1,19 @@
+import { PropertyStatus, PropertyType } from "../../../generated/prisma/enums";
+
+
+export interface ICreatePropertyPayload {
+    title: string;
+    description: string;
+    type: PropertyType;
+    status?: PropertyStatus;
+    price: number;
+    location: string;
+    address: string;
+    city: string;
+    bedrooms: number;
+    bathrooms: number;
+    areaSqft?: number | null;
+    amenities?: string[];
+    images?: string[];
+    landlordId: string;
+}

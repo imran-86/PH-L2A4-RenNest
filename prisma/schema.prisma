@@ -18,6 +18,20 @@ enum UserStatus {
   ACTIVE
   BANNED
 }
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  CONDO
+  VILLA
+  STUDIO
+  DUPLEX
+  PENTHOUSE
+}
+enum PropertyStatus {
+  AVAILABLE
+  UNAVAILABLE
+  RENTED
+}
 model User {
   id           String     @id @default(uuid())
   name         String
@@ -30,5 +44,40 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
+  
+  properties      Property[] 
+
   @@map("users")
+}
+
+model Property {
+  id            String         @id @default(uuid())
+  title         String
+  description   String
+  type          PropertyType
+  status        PropertyStatus @default(AVAILABLE)
+
+  price         Decimal        @db.Decimal(10, 2)
+  location      String
+  address       String
+  city          String
+  bedrooms      Int
+  bathrooms     Int
+  areaSqft      Int?
+  amenities     String[]       @default([])
+  images        String[]       @default([])
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  landlordId    String
+  landlord      User            @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+
+ 
+
+  @@index([landlordId])
+  @@index([city])
+  @@index([status])
+  @@map("properties")
 }
