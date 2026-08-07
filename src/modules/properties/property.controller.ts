@@ -51,8 +51,41 @@ const deleteProperty = catchAsync(async (req : Request, res : Response, next : N
     })
 })
 
+const getAllProperties = async (req: Request, res: Response) => {
+    try {
+        const query = {
+            searchTerm: req.query.searchTerm as string,
+            location: req.query.location as string,
+            city: req.query.city as string,
+            type: req.query.type as any,
+            status: req.query.status as any,
+            minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
+            maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+            bedrooms: req.query.bedrooms ? parseInt(req.query.bedrooms as string) : undefined,
+            bathrooms: req.query.bathrooms ? parseInt(req.query.bathrooms as string) : undefined,
+            sortBy: req.query.sortBy as string,
+            sortOrder: req.query.sortOrder as 'asc' | 'desc',
+        };
+
+        const properties = await propertyService.getAllPropertiesFromDB(query);
+
+        res.status(200).json({
+            success: true,
+            message: 'Properties fetched successfully',
+            data: properties,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch properties',
+        });
+    }
+};
+
+
 export const propertyController = {
     createProperty,
     updateProperty,
     deleteProperty,
+    getAllProperties
 }
