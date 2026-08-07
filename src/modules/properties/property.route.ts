@@ -9,4 +9,9 @@ router.post("/properties",
     auth(Role.LANDLORD),
     propertyController.createProperty);
 
+router.patch("/:propertyId",
+    auth(Role.LANDLORD),
+    propertyController.updateProperty);
+    
+
 export const propertyRoutes = router;

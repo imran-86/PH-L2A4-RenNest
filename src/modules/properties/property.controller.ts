@@ -15,6 +15,25 @@ const createProperty = catchAsync(async (req : Request, res : Response, next : N
         data: { property }
     })
 })
+
+const updateProperty = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
+    const propertyId = req.params.propertyId;
+    const payload = req.body;
+    const landlordId = req.user?.id;
+    if (!propertyId) {
+        throw new Error("Property Id Required In Params")
+    }
+    const property = await propertyService.updatePropertyIntoDB(propertyId as string, payload,landlordId as string);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Property updated successfully",
+        data: { property }
+    })
+})
+
 export const propertyController = {
     createProperty,
+    updateProperty,
 }

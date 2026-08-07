@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { ICreatePropertyPayload } from "./property.interface";
+import { ICreatePropertyPayload, IUpdatePropertyPayload } from "./property.interface";
 
 const createPropertyIntoDB = async (payload : ICreatePropertyPayload) => {
     const { title, description, type, status, price, location, address, city, bedrooms, bathrooms, areaSqft, amenities, images, landlordId } = payload; 
@@ -25,6 +25,29 @@ const createPropertyIntoDB = async (payload : ICreatePropertyPayload) => {
 
     return property;
 }
+const updatePropertyIntoDB = async (propertyId : string, payload : IUpdatePropertyPayload,landlordId : string) => {
+    const property = await prisma.property.findUnique({
+        where : {
+            id : propertyId,
+           
+        },
+    });
+    if(property?.landlordId !== landlordId){
+        throw new Error("You are not authorized to update this property.");
+    }
+    const updatedProperty = await prisma.property.update({
+        where : {
+            id : propertyId,
+        },
+        data : payload,
+        include : {
+            landlord : true,
+        }
+    });
+    return updatedProperty;
+}
+
 export const propertyService = {
     createPropertyIntoDB,
+    updatePropertyIntoDB,
 }
