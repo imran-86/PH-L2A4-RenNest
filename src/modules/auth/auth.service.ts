@@ -53,7 +53,27 @@ const loginUser = async (payload : ILoginUser) => {
         role: user.role
     };
 }
+const getLoggedInUserFromDB = async (userId: string) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        omit: {
+            password: true,
+        },
+        include: {
+            properties: true, 
+        },
+    });
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    return user;
+}
 
 export const authService = {
     loginUser,
+    getLoggedInUserFromDB
 }
