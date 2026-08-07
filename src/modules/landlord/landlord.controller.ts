@@ -1,7 +1,8 @@
 import { catchAsync } from "../../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import { landlordService } from "./lanlord.service";
-
+import { RentalRequestStatus } from "../../../generated/prisma/enums";
+import { log } from "console";
 const getLandlordRentalRequests = catchAsync(async (req: Request, res: Response,next : NextFunction) => {
   
 
@@ -22,6 +23,58 @@ const getLandlordRentalRequests = catchAsync(async (req: Request, res: Response,
         });
     
 });
+const updateRentalRequestStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const landlordId = req.user?.id;
+
+        const { requestId } = req.params;
+        console.log("Request ID:", requestId);
+        const { status } = req.body;
+
+        if (!status || ![RentalRequestStatus.APPROVED, RentalRequestStatus.REJECTED].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status. Must be APPROVED or REJECTED',
+            });
+        }
+
+        const updatedRequest = await landlordService.updateRentalRequestStatus(requestId as string, landlordId as string, status);
+
+        const statusMessage = status === RentalRequestStatus.APPROVED ? 'approved' : 'rejected';
+
+        res.status(200).json({
+            success: true,
+            message: `Rental request ${statusMessage} successfully`,
+            data: updatedRequest,
+        });
+    } catch (error: any) {
+        if (error.message === 'Rental request not found') {
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        if (error.message === 'You are not authorized to update this request') {
+            return res.status(403).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        if (error.message.includes('already')) {
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to update rental request',
+        });
+    }
+});
+
+
 export const landlordController = {
-    getLandlordRentalRequests
+    getLandlordRentalRequests,
+    updateRentalRequestStatus
 };
