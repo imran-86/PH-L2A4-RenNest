@@ -24,6 +24,7 @@ app.get("/", (req : Request, res : Response) => {
 app.use("/api/users", userRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/landloard",propertyRoutes)
+app.use("/api/auth",authRoutes)
 app.use("/api/landloard/properties",propertyRoutes)
 app.use("/api/landloard/properties",propertyRoutes)
 app.use("/api/properties",propertyRoutes)

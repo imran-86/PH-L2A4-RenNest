@@ -37,6 +37,17 @@ const loginUser = catchAsync(async (req : Request, res : Response, next : NextFu
         data: { accessToken, refreshToken , id,name,email,role}
     });
 });
+const getLoggedInUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    console.log("Logged in user ID:", req.user?.name);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User fetched successfully",
+        data: { user }
+    });
+});
 export const authController = {
     loginUser,
+    getLoggedInUser
 }
