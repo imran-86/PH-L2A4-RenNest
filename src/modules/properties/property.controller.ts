@@ -33,7 +33,26 @@ const updateProperty = catchAsync(async (req : Request, res : Response, next : N
     })
 })
 
+const deleteProperty = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
+    const propertyId = req.params.propertyId;
+    const landlordId = req.user?.id;
+
+    if (!propertyId) {
+        throw new Error("Property Id Required In Params")
+    }
+
+    const property = await propertyService.deletePropertyFromDB(propertyId as string, landlordId as string);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Property deleted successfully",
+        data: { property }
+    })
+})
+
 export const propertyController = {
     createProperty,
     updateProperty,
+    deleteProperty,
 }
