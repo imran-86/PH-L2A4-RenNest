@@ -5,6 +5,7 @@ import config from "./config";
 import { userRoutes } from "./modules/user/user.route";
 import { authRoutes } from "./modules/auth/auth.route";
 import { propertyRoutes } from "./modules/properties/property.route";
+import { rentalRequestRoutes } from "./modules/RentalRequest/rental_request.route";
 const app : Application = express();
 
 app.use(cors({
@@ -29,6 +30,10 @@ app.use("/api/landloard/properties",propertyRoutes)
 app.use("/api/landloard/properties",propertyRoutes)
 app.use("/api/properties",propertyRoutes)
 app.use("/api/properties",propertyRoutes)
+
+app.use("/api/rentals",rentalRequestRoutes)
+app.use("/api/landlord/requests",
+    rentalRequestRoutes)
 
 
 

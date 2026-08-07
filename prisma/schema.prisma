@@ -46,6 +46,7 @@ model User {
 
   
   properties      Property[] 
+  rentalRequests  RentalRequest[]
 
   @@map("users")
 }
@@ -74,10 +75,40 @@ model Property {
   landlordId    String
   landlord      User            @relation(fields: [landlordId], references: [id], onDelete: Cascade)
 
- 
+  rentalRequests RentalRequest[]
 
   @@index([landlordId])
   @@index([city])
   @@index([status])
   @@map("properties")
+}
+
+enum RentalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+model RentalRequest {
+  id            String               @id @default(uuid())
+  status        RentalRequestStatus  @default(PENDING)
+  moveInDate    DateTime
+  moveOutDate   DateTime?
+  message       String?
+
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  // Relations
+  tenantId      String
+  tenant        User        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  propertyId    String
+  property      Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  
+
+  @@index([tenantId])
+  @@index([propertyId])
+  @@index([status])
+  @@map("rental_requests")
 }

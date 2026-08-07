@@ -32,19 +32,31 @@ export const auth = (...requiredRoles : Role[]) => {
             : req.headers.authorization;
 
         if(!token){
-            throw new Error("You are not logged in. Please log in to access this resource.");
+            // throw new Error("You are not logged in. Please log in to access this resource.");
+            return res.status(401).json({
+                success: false,
+                message: "You are not logged in. Please log in to access this resource.",
+            });
         }
 
         const verifiedToken = jwtUtils.verifyToken(token, config.jwt_access_secret as string);
 
         if (!verifiedToken.success) {
-            throw new Error(verifiedToken.error);
+            // throw new Error(verifiedToken.error);
+            return res.status(401).json({
+                success: false,
+                message: verifiedToken.error,
+            });
         }
 
         const { email, name, id, role } = verifiedToken.data as JwtPayload;
 
         if(requiredRoles.length && !requiredRoles.includes(role)){
-            throw new Error("Forbidden. You don't have permission to access this resource.");
+            // throw new Error("Forbidden. You don't have permission to access this resource.");
+            return res.status(403).json({
+                success: false,
+                message: "Forbidden. You don't have permission to access this resource.",
+            });
         }
 
         const user = await prisma.user.findUnique({
@@ -57,11 +69,19 @@ export const auth = (...requiredRoles : Role[]) => {
         });
 
         if(!user){
-            throw new Error("User not found. Please log in again.");
+            // throw new Error("User not found. Please log in again.");
+            return res.status(404).json({
+                success: false,
+                message: "User not found. Please log in again.",
+            });
         }
 
         if(user.status === "BANNED"){
-            throw new Error("Your account has been banned. Please contact support.");
+            // throw new Error("Your account has been banned. Please contact support.");
+            return res.status(403).json({
+                success: false,
+                message: "Your account has been banned. Please contact support.",
+            });
         }
 
         req.user = {
