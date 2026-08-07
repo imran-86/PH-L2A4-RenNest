@@ -154,9 +154,18 @@ const getAllPropertiesFromDB = async (query: IPropertyQuery) => {
 
     return properties;
 };
+const getSinglePropertyFromDB = async (propertyId : string) => {
+    const property = await prisma.property.findUnique({
+        where : {
+            id : propertyId
+        }
+    });
+    return property;
+};
 export const propertyService = {
     createPropertyIntoDB,
     updatePropertyIntoDB,
     deletePropertyFromDB,
     getAllPropertiesFromDB,
+    getSinglePropertyFromDB
 }

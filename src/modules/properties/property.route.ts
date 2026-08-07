@@ -17,6 +17,7 @@ router.delete("/:propertyId",
     propertyController.deleteProperty);
 
 router.get("/", propertyController.getAllProperties);
+router.get("/:propertyId", propertyController.getSingleProperty);
 
 
 
