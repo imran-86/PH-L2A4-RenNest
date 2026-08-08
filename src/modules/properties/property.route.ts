@@ -9,7 +9,7 @@ router.post("/properties",
     auth(Role.LANDLORD),
     propertyController.createProperty);
 
-router.patch("/:propertyId",
+router.put("/:propertyId",
     auth(Role.LANDLORD),
     propertyController.updateProperty);
 router.delete("/:propertyId",

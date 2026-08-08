@@ -7,6 +7,7 @@ import { authRoutes } from "./modules/auth/auth.route";
 import { propertyRoutes } from "./modules/properties/property.route";
 import { landlordRoutes } from "./modules/landlord/landlord.route";
 import { rentalRequestRoutes } from "./modules/RentalRequest/rental_request.route";
+import { adminRoutes } from "./modules/admin/admin.route";
 const app : Application = express();
 
 app.use(cors({
@@ -35,6 +36,8 @@ app.use("/api/properties",propertyRoutes)
 app.use("/api/rentals",rentalRequestRoutes)
 app.use("/api/landlord/requests",
   landlordRoutes)
+
+app.use("/api/admin",adminRoutes)
 
 
 
