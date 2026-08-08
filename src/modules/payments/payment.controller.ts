@@ -3,6 +3,7 @@ import { paymentService } from './payment.service';
 import { prisma } from '../../lib/prisma';
 
 import { RentalRequestStatus } from '../../../generated/prisma/enums';
+import { log } from 'console';
 
 const createPaymentSession = async (req: Request, res: Response) => {
     try {
@@ -130,8 +131,46 @@ const verifyPayment = async (req: Request, res: Response) => {
         });
     }
 };
+const getTenantPayments = async (req: Request, res: Response) => {
+    try {
+        const tenantId = req.user?.id;
+
+        if (!tenantId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized',
+            });
+        }
+
+        const payments = await paymentService.getTenantPayments(tenantId);
+        
+
+        if(payments.length === 0){
+            res.status(200).json({
+            success: true,
+            message: 'Payment history fetched successfully',
+            data: {
+                message : 'You do not have any payment history yet',
+                payments
+            },
+        });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Payment history fetched successfully',
+            data: payments,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch payment history',
+        });
+    }
+};
 
 export const paymentController = {
     createPaymentSession,
-    verifyPayment
+    verifyPayment,
+    getTenantPayments
 };

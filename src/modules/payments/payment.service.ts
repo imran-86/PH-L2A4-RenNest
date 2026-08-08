@@ -192,7 +192,20 @@ const verifyStripePayment = async (sessionId: string) => {
         session,
     };
 };
-
+const getTenantPayments = async (tenantId: string) => {
+    const payments = await prisma.payment.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+        include: {
+            rentalRequest: {
+                include: {
+                    property: true,
+                },
+            },
+        },
+    });
+    return payments;
+};
 
 
 
@@ -200,4 +213,5 @@ export const paymentService = {
     createStripePaymentSession,
     verifyStripePayment,
     handleStripeWebhook,
+    getTenantPayments
 };
