@@ -77,8 +77,118 @@ const updateUserStatusInDb = async (userId: string, status: UserStatus) => {
 
     return updatedUser;
 };
+const getAllPropertiesForAdmin = async (query: any) => {
+    const { searchTerm, type, status, city, minPrice, maxPrice, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+
+    const where: any = {};
+
+    if (searchTerm) {
+        where.OR = [
+            { title: { contains: searchTerm, 
+                mode: 'insensitive' } 
+            },
+            { description: { contains: searchTerm,
+                 mode: 'insensitive' } 
+            },
+            { location: { contains: searchTerm,
+                 mode: 'insensitive' } 
+            },
+            { city: { contains: searchTerm, 
+                mode: 'insensitive' } 
+            },
+        ];
+    }
+
+    if (type) {
+        where.type = type;
+    }
+
+    if (status) {
+        where.status = status;
+    }
+
+    if (city) {
+        where.city = { contains: city, mode: 'insensitive' };
+    }
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+        where.price = {};
+        if (minPrice !== undefined){
+           where.price.gte = minPrice;
+        } 
+        if (maxPrice !== undefined){
+           where.price.lte = maxPrice;
+        } 
+    }
+
+    const properties = await prisma.property.findMany({
+        where,
+        orderBy: {
+            [sortBy]: sortOrder,
+        },
+        include: {
+            landlord: {
+                omit: {
+                    password: true,
+                },
+            },
+            _count: {
+                select: {
+                    rentalRequests: true,
+                },
+            },
+        },
+    });
+
+    return properties;
+};
+
+const getAllRentalRequestsForAdmin = async (query: any) => {
+    const { status, propertyId, tenantId, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+
+    const where: any = {};
+
+    if (status) {
+        where.status = status;
+    }
+
+    if (propertyId) {
+        where.propertyId = propertyId;
+    }
+
+    if (tenantId) {
+        where.tenantId = tenantId;
+    }
+
+    const rentalRequests = await prisma.rentalRequest.findMany({
+        where,
+        orderBy: {
+            [sortBy]: sortOrder,
+        },
+        include: {
+            tenant: {
+                omit: {
+                    password: true,
+                },
+            },
+            property: {
+                include: {
+                    landlord: {
+                        omit: {
+                            password: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    return rentalRequests;
+};
 
 export const adminService = {
     getAllUsersFromDb,
     updateUserStatusInDb,
+    getAllPropertiesForAdmin,
+    getAllRentalRequestsForAdmin,
 };

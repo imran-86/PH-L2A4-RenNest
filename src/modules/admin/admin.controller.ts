@@ -65,8 +65,63 @@ const updateUserStatus = catchAsync(async (req: Request, res: Response, next: Ne
         });
     }
 });
+const getAllProperties = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const query = {
+            searchTerm: req.query.searchTerm as string,
+            type: req.query.type as any,
+            status: req.query.status as any,
+            city: req.query.city as string,
+            minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
+            maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+            sortBy: req.query.sortBy as string,
+            sortOrder: req.query.sortOrder as 'asc' | 'desc',
+        };
+
+        const properties = await adminService.getAllPropertiesForAdmin(query);
+
+        res.status(200).json({
+            success: true,
+            message: 'Properties fetched successfully',
+            data: properties,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch properties',
+        });
+    }
+});
+
+
+const getAllRentalRequests = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const query = {
+            status: req.query.status as any,
+            propertyId: req.query.propertyId as string,
+            tenantId: req.query.tenantId as string,
+            sortBy: req.query.sortBy as string,
+            sortOrder: req.query.sortOrder as 'asc' | 'desc',
+        };
+
+        const rentalRequests = await adminService.getAllRentalRequestsForAdmin(query);
+
+        res.status(200).json({
+            success: true,
+            message: 'Rental requests fetched successfully',
+            data: rentalRequests,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch rental requests',
+        });
+    }
+});
 
 export const adminController = {
     getAllUsers,
     updateUserStatus,
+    getAllProperties,
+    getAllRentalRequests,
 };
