@@ -129,10 +129,75 @@ const handleStripeWebhook = async (event: any) => {
         }
     }
 };
+const verifyStripePayment = async (sessionId: string) => {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    const payment = await prisma.payment.findUnique({
+        where: { transactionId: sessionId },
+        include: {
+            rentalRequest: true,
+        },
+    });
+
+    if (!payment) {
+        throw new Error('Payment record not found');
+    }
+
+    if (session.payment_status === 'paid') {
+        await prisma.payment.update({
+            where: { id: payment.id },
+            data: {
+                status: PaymentStatus.COMPLETED,
+                paidAt: new Date(),
+                providerRef: session.payment_intent as string,
+                metadata: {
+                    ...(payment.metadata as any),
+                    paymentIntentId: session.payment_intent,
+                },
+            },
+        });
+
+        await prisma.rentalRequest.update({
+            where: { id: payment.rentalRequestId },
+            data: {
+                isPaid: true,
+                paidAt: new Date(),
+                paymentId: payment.id,
+            },
+        });
+
+        return {
+            success: true,
+            payment,
+            session,
+        };
+    }
+
+    if (session.payment_status === 'unpaid' || session.payment_status === 'no_payment_required') {
+        await prisma.payment.update({
+            where: { id: payment.id },
+            data: {
+                status: PaymentStatus.FAILED,
+                metadata: {
+                    ...(payment.metadata as any),
+                    failureReason: session.payment_status,
+                },
+            },
+        });
+    }
+
+    return {
+        success: false,
+        payment,
+        session,
+    };
+};
+
 
 
 
 export const paymentService = {
     createStripePaymentSession,
+    verifyStripePayment,
     handleStripeWebhook,
 };

@@ -97,9 +97,41 @@ const createPaymentSession = async (req: Request, res: Response) => {
     }
 };
 
+const verifyPayment = async (req: Request, res: Response) => {
+    try {
+        const { session_id } = req.query;
 
+        if (!session_id) {
+            return res.status(400).json({
+                success: false,
+                message: 'Session ID is required',
+            });
+        }
+
+        const result = await paymentService.verifyStripePayment(session_id as string);
+
+        if (result.success) {
+            res.status(200).json({
+                success: true,
+                message: 'Payment verified successfully',
+                data: result.payment,
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                message: 'Payment not successful',
+                data: result.payment,
+            });
+        }
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to verify payment',
+        });
+    }
+};
 
 export const paymentController = {
     createPaymentSession,
-    
+    verifyPayment
 };

@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Create payment session (tenant)
 router.post('/create-session', auth(Role.TENANT), paymentController.createPaymentSession);
+router.get('/verify', paymentController.verifyPayment);
 
 
 
