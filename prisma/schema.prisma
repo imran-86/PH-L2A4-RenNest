@@ -48,6 +48,7 @@ model User {
   
   properties      Property[] 
   rentalRequests  RentalRequest[]
+  payments        Payment[] 
 
   @@map("users")
 }
@@ -89,6 +90,56 @@ enum RentalRequestStatus {
   APPROVED
   REJECTED
 }
+
+enum PaymentProvider {
+  STRIPE
+  SSLCOMMERZ
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentType {
+  RENT
+  SECURITY_DEPOSIT
+  UTILITY
+  OTHER
+}
+
+model Payment {
+  id              String          @id @default(uuid())
+  transactionId   String          @unique
+  amount          Decimal         @db.Decimal(10, 2)
+  currency        String          @default("BDT")
+  method          String
+  provider        PaymentProvider
+  status          PaymentStatus   @default(PENDING)
+  paymentType     PaymentType     @default(RENT)
+  paidAt          DateTime?
+  failureReason   String?
+
+  providerRef     String?
+  metadata        Json?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  rentalRequestId String          @unique
+  rentalRequest   RentalRequest   @relation(fields: [rentalRequestId], references: [id], onDelete: Cascade)
+
+  tenantId        String
+  tenant          User            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([transactionId])
+  @@map("payments")
+}
+
 model RentalRequest {
   id            String               @id @default(uuid())
   status        RentalRequestStatus  @default(PENDING)
@@ -99,14 +150,16 @@ model RentalRequest {
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
 
-  // Relations
   tenantId      String
   tenant        User        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   propertyId    String
   property      Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
-  
+  isPaid        Boolean     @default(false)
+  paidAt        DateTime?
+  paymentId     String?     @unique
+  payment       Payment?    
 
   @@index([tenantId])
   @@index([propertyId])

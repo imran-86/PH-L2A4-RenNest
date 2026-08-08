@@ -8,12 +8,21 @@ import { propertyRoutes } from "./modules/properties/property.route";
 import { landlordRoutes } from "./modules/landlord/landlord.route";
 import { rentalRequestRoutes } from "./modules/RentalRequest/rental_request.route";
 import { adminRoutes } from "./modules/admin/admin.route";
+import { paymentRoutes } from "./modules/payments/payment.route";
+
 const app : Application = express();
+
+
 
 app.use(cors({
     origin : config.app_url,
     credentials : true,
 }))
+
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,7 +41,7 @@ app.use("/api/landloard/properties",propertyRoutes)
 app.use("/api/landloard/properties",propertyRoutes)
 app.use("/api/properties",propertyRoutes)
 app.use("/api/properties",propertyRoutes)
-
+app.use("/api/payments", paymentRoutes);
 app.use("/api/rentals",rentalRequestRoutes)
 app.use("/api/landlord/requests",
   landlordRoutes)
