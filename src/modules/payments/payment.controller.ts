@@ -168,9 +168,48 @@ const getTenantPayments = async (req: Request, res: Response) => {
         });
     }
 };
+const getPaymentById = async (req: Request, res: Response) => {
+    try {
+        const tenantId = req.user?.id;
+        const { id } = req.params;
+
+        if (!tenantId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized',
+            });
+        }
+
+        const payment = await paymentService.getPaymentById(id as string, tenantId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Payment details fetched successfully',
+            data: payment,
+        });
+    } catch (error: any) {
+        if (error.message === 'Payment not found') {
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        if (error.message === 'You are not authorized to view this payment') {
+            return res.status(403).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch payment details',
+        });
+    }
+};
 
 export const paymentController = {
     createPaymentSession,
     verifyPayment,
-    getTenantPayments
+    getTenantPayments,
+    getPaymentById
 };

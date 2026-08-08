@@ -10,6 +10,7 @@ const router = express.Router();
 router.post('/create-session', auth(Role.TENANT), paymentController.createPaymentSession);
 router.get('/verify', paymentController.verifyPayment);
 router.get('/history', auth(Role.TENANT), paymentController.getTenantPayments);
+router.get('/:id', auth(Role.TENANT), paymentController.getPaymentById);
 
 
 

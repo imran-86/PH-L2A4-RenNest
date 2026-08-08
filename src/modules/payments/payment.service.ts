@@ -206,6 +206,33 @@ const getTenantPayments = async (tenantId: string) => {
     });
     return payments;
 };
+const getPaymentById = async (paymentId: string, tenantId: string) => {
+    const payment = await prisma.payment.findUnique({
+        where: { id: paymentId },
+        include: {
+            rentalRequest: {
+                include: {
+                    property: true,
+                },
+            },
+            tenant: {
+                omit: {
+                    password: true,
+                },
+            },
+        },
+    });
+
+    if (!payment) {
+        throw new Error('Payment not found');
+    }
+
+    if (payment.tenantId !== tenantId) {
+        throw new Error('You are not authorized to view this payment');
+    }
+
+    return payment;
+};
 
 
 
@@ -213,5 +240,6 @@ export const paymentService = {
     createStripePaymentSession,
     verifyStripePayment,
     handleStripeWebhook,
-    getTenantPayments
+    getTenantPayments,
+    getPaymentById
 };
