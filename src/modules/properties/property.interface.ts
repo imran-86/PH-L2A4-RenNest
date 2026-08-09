@@ -17,6 +17,7 @@ export interface ICreatePropertyPayload {
     amenities?: string[];
     images?: string[];
     landlordId: string;
+    categoryId : string
 }
 export interface IUpdatePropertyPayload {
     title?: string;
@@ -39,4 +40,10 @@ export interface IPropertyQuery extends PropertyWhereInput {
     searchTerm?: string;
     sortOrder?: string
     sortBy?: string
+}
+export interface ICategoryOfProperty {
+    id? : string,
+    name? : string,
+    description? : string
+    
 }

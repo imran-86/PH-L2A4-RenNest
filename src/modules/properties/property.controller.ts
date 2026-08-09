@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { propertyService } from "./property.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { prisma } from "../../lib/prisma";
 
 const createProperty = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
     const payload = req.body;
@@ -53,6 +54,7 @@ const deleteProperty = catchAsync(async (req : Request, res : Response, next : N
 
 const getAllProperties = async (req: Request, res: Response) => {
     try {
+        
         const query = {
             searchTerm: req.query.searchTerm as string,
             location: req.query.location as string,

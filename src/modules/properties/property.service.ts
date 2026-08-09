@@ -1,11 +1,15 @@
 import { prisma } from "../../lib/prisma";
-import { ICreatePropertyPayload, IPropertyQuery, IUpdatePropertyPayload } from "./property.interface";
+import { ICategoryOfProperty, ICreatePropertyPayload, IPropertyQuery, IUpdatePropertyPayload } from "./property.interface";
 
 const createPropertyIntoDB = async (payload : ICreatePropertyPayload) => {
-    const { title, description, type, status, price, location, address, city, bedrooms, bathrooms, areaSqft, amenities, images, landlordId } = payload; 
+    const { title, description, type, status, price, location, address, city, bedrooms, bathrooms, areaSqft, amenities, images, landlordId} = payload; 
 
-    const categoryId = await prisma.category.findUnique()
-
+     const category = await prisma.category.findUnique({
+        where: { name: type as any }, 
+       });
+     if (!category) {
+        throw new Error(`Category "${type}" does not exist. Available categories: HOUSE, APARTMENT, CONDO, VILLA, STUDIO, DUPLEX, PENTHOUSE`);
+    }
     const property = await prisma.property.create({
         data : {
             title,
@@ -22,7 +26,8 @@ const createPropertyIntoDB = async (payload : ICreatePropertyPayload) => {
             amenities,
             images,
             landlordId,
-            categoryId
+            categoryId : category.id
+             
         }
     });
 
