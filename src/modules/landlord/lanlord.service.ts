@@ -106,7 +106,82 @@ const updateRentalRequestStatus = async ( requestId: string, landlordId: string,
     return updatedRequest;
 };
 
+const getPropertyRentalHistoryFromDB = async (propertyId: string, landlordId: string) => {
+  
+    const property = await prisma.property.findFirst({
+        where: {
+            id: propertyId,
+            landlordId: landlordId,
+        },
+        select: {
+            id: true,
+            title: true,
+            type: true,
+            price: true,
+            location: true,
+            city: true,
+            images: true,
+            description: true,
+        },
+    });
+
+    if (!property) {
+        throw new Error('Property not found or you are not the owner');
+    }
+
+    const rentalHistory = await prisma.rentalRequest.findMany({
+        where: {
+            propertyId: propertyId,
+            isPaid: true, 
+        },
+        include: {
+            tenant: {
+                omit: {
+                    password: true,
+                },
+            },
+            payment: {
+                select: {
+                    id: true,
+                    amount: true,
+                    status: true,
+                    paidAt: true,
+                },
+            },
+            review: {
+                include: {
+                    tenant: {
+                        omit: {
+                            password: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+    const ratingStats = await prisma.review.aggregate({
+        where: {
+            propertyId: propertyId,
+        },
+        _avg: {
+            rating: true,
+        },
+        _count: {
+            rating: true,
+        },
+    });
+    return {
+        property: property,
+        rentalHistory: rentalHistory,
+        ratingStats: {
+            averageRating: ratingStats._avg.rating || 0,
+            totalReviews: ratingStats._count.rating || 0,
+        },
+    };
+};
+
 export const landlordService = {
     getLandlordRentalRequestsFromDB,
-    updateRentalRequestStatus
+    updateRentalRequestStatus,
+    getPropertyRentalHistoryFromDB
 };

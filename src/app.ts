@@ -49,6 +49,7 @@ app.use("/api/landlord/requests",
 
 app.use("/api/admin",adminRoutes)
 app.use("/api/review",reviewRoutes)
+app.use("/api/reviews/property/history",landlordRoutes)
 
 
 

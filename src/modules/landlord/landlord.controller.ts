@@ -72,9 +72,49 @@ const updateRentalRequestStatus = catchAsync(async (req: Request, res: Response,
         });
     }
 });
+const getPropertyRentalHistory = async (req: Request, res: Response) => {
+    try {
+        const landlordId = req.user?.id;
+
+        if (!landlordId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized',
+            });
+        }
+        const { propertyId } = req.params;
+
+        if (!propertyId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Property ID is required',
+            });
+        }
+
+        const result = await landlordService.getPropertyRentalHistoryFromDB(propertyId as string, landlordId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Rental history and reviews fetched successfully',
+            data: result,
+        });
+    } catch (error: any) {
+        if (error.message === 'Property not found or you are not the owner') {
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch rental history',
+        });
+    }
+};
 
 
 export const landlordController = {
     getLandlordRentalRequests,
-    updateRentalRequestStatus
+    updateRentalRequestStatus,
+    getPropertyRentalHistory
 };
