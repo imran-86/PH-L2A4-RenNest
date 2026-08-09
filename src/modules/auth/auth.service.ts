@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
-import { ILoginUser } from "./auth.interface";
+import { ILoginUser} from "./auth.interface";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../config";
 import { SignOptions } from "jsonwebtoken";
@@ -72,6 +72,8 @@ const getLoggedInUserFromDB = async (userId: string) => {
 
     return user;
 }
+
+
 
 export const authService = {
     loginUser,

@@ -11,4 +11,5 @@ router.get("/me",
     authController.getLoggedInUser);
 
 
+
 export const authRoutes = router;
