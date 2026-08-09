@@ -217,6 +217,23 @@ const getAllCategoryFromDb = async ()=>{
     }
     return category;
 }
+const deleteCategoryByIdFromDb = async(categoryId : string)=>{
+    const category = await prisma.category.findUnique({
+        where : {
+            id : categoryId
+        }
+    })
+    if(!category){
+        throw new Error ('This category do not exist in our database')
+    }
+
+    await prisma.category.delete({
+        where : {
+            id : categoryId
+        }
+    })
+    return category
+}
 
 export const adminService = {
     getAllUsersFromDb,
@@ -224,5 +241,6 @@ export const adminService = {
     getAllPropertiesForAdmin,
     getAllRentalRequestsForAdmin,
     createCategoryIntoDb,
-    getAllCategoryFromDb
+    getAllCategoryFromDb,
+    deleteCategoryByIdFromDb
 };

@@ -14,5 +14,7 @@ router.get("/properties",auth(Role.ADMIN),adminController.getAllProperties);
 router.get("/rentals",auth(Role.ADMIN),adminController.getAllRentalRequests);
 router.post("/create-category",auth(Role.ADMIN),adminController.createCategory)
 router.get("/category",adminController.getAllCategory)
+router.delete("/category/:categoryId",auth(Role.ADMIN),adminController.deleteCategoryById)
+
 
 export const adminRoutes = router;

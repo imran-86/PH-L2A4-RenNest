@@ -168,11 +168,36 @@ const getAllCategory = async(req : Request , res : Response)=>{
         });
      }
 }
+const deleteCategoryById = async(req : Request,res : Response)=>{
+    const {categoryId }= req.params
+    try{
+        const category = await adminService.deleteCategoryByIdFromDb(categoryId as string);
+       sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: `Category ${category.name} deleted successfully`,
+        data: { category }
+    })
+    }catch(error : any){
+        if(error.message === "This category do not exist in our database"){
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+        }
+         res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to delete category',
+        });
+
+    }
+}
 export const adminController = {
     getAllUsers,
     updateUserStatus,
     getAllProperties,
     getAllRentalRequests,
     createCategory,
-    getAllCategory
+    getAllCategory,
+    deleteCategoryById,
 };
