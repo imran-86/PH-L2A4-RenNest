@@ -210,7 +210,13 @@ const createCategoryIntoDb = async(payload : any) =>{
 
 }
 
-
+const getAllCategoryFromDb = async ()=>{
+    const category = await prisma.category.findMany();
+    if(category.length === 0){
+        throw new Error ('We have no category yet , please create category first')
+    }
+    return category;
+}
 
 export const adminService = {
     getAllUsersFromDb,
@@ -218,4 +224,5 @@ export const adminService = {
     getAllPropertiesForAdmin,
     getAllRentalRequestsForAdmin,
     createCategoryIntoDb,
+    getAllCategoryFromDb
 };

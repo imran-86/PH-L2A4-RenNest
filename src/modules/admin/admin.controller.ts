@@ -144,11 +144,35 @@ const createCategory = catchAsync(async (req : Request,res : Response,next : Nex
         });
      }
 })
+const getAllCategory = async(req : Request , res : Response)=>{
+   
+     try{
+         const category = await adminService.getAllCategoryFromDb()
+         sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: "Category fetch successfully",
+        data: { category }
+    })
 
+     }catch(error : any){
+       if (error.message === "We have no category yet , please create category first") {
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch category',
+        });
+     }
+}
 export const adminController = {
     getAllUsers,
     updateUserStatus,
     getAllProperties,
     getAllRentalRequests,
-    createCategory
+    createCategory,
+    getAllCategory
 };
