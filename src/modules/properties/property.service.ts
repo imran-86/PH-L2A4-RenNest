@@ -4,6 +4,8 @@ import { ICreatePropertyPayload, IPropertyQuery, IUpdatePropertyPayload } from "
 const createPropertyIntoDB = async (payload : ICreatePropertyPayload) => {
     const { title, description, type, status, price, location, address, city, bedrooms, bathrooms, areaSqft, amenities, images, landlordId } = payload; 
 
+    const categoryId = await prisma.category.findUnique()
+
     const property = await prisma.property.create({
         data : {
             title,
@@ -19,7 +21,8 @@ const createPropertyIntoDB = async (payload : ICreatePropertyPayload) => {
             areaSqft,
             amenities,
             images,
-            landlordId
+            landlordId,
+            categoryId
         }
     });
 

@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { adminService } from "./admin.service";
 import { UserStatus } from "../../../generated/prisma/enums";
+import { sendResponse } from "../../utils/sendResponse";
+import httpStatus from "http-status";
 
 
 const getAllUsers = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
@@ -118,10 +120,35 @@ const getAllRentalRequests = catchAsync(async (req: Request, res: Response, next
         });
     }
 });
+const createCategory = catchAsync(async (req : Request,res : Response,next : NextFunction)=>{
+    const payload = req.body;
+     try{
+         const category = await adminService.createCategoryIntoDb(payload)
+         sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Category created successfully",
+        data: { category }
+    })
+
+     }catch(error : any){
+       if (error.message === "This category is exist in our database , Please create new category") {
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to create user category',
+        });
+     }
+})
 
 export const adminController = {
     getAllUsers,
     updateUserStatus,
     getAllProperties,
     getAllRentalRequests,
+    createCategory
 };

@@ -1,3 +1,4 @@
+import { error } from "node:console";
 import { UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
@@ -186,9 +187,35 @@ const getAllRentalRequestsForAdmin = async (query: any) => {
     return rentalRequests;
 };
 
+const createCategoryIntoDb = async(payload : any) =>{
+    const {name , description} = payload;
+    const isExistCategory = await prisma.category.findUnique({
+        where : {
+            name
+        }
+    })
+    if(isExistCategory){
+        throw new Error ("This category is exist in our database , Please create new category");
+    }
+    
+     const category = await prisma.category.create({
+            data: {
+                name: name,
+                description: description
+            },
+        });
+   
+
+    return category;
+
+}
+
+
+
 export const adminService = {
     getAllUsersFromDb,
     updateUserStatusInDb,
     getAllPropertiesForAdmin,
     getAllRentalRequestsForAdmin,
+    createCategoryIntoDb,
 };

@@ -76,11 +76,15 @@ model Property {
   // Relations
   landlordId    String
   landlord      User            @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+   
+  categoryId    String
+  category      Category        @relation(fields: [categoryId], references: [id])
 
   rentalRequests RentalRequest[]
 
   @@index([landlordId])
   @@index([city])
+    @@index([categoryId])
   @@index([status])
   @@map("properties")
 }
@@ -165,4 +169,16 @@ model RentalRequest {
   @@index([propertyId])
   @@index([status])
   @@map("rental_requests")
+}
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  properties  Property[]
+
+  @@map("categories")
 }
