@@ -45,7 +45,7 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  
+  reviews         Review[]
   properties      Property[] 
   rentalRequests  RentalRequest[]
   payments        Payment[] 
@@ -81,6 +81,7 @@ model Property {
   category      Category        @relation(fields: [categoryId], references: [id])
 
   rentalRequests RentalRequest[]
+  reviews         Review[]
 
   @@index([landlordId])
   @@index([city])
@@ -164,6 +165,7 @@ model RentalRequest {
   paidAt        DateTime?
   paymentId     String?     @unique
   payment       Payment?    
+  review        Review?
 
   @@index([tenantId])
   @@index([propertyId])
@@ -181,4 +183,27 @@ model Category {
   properties  Property[]
 
   @@map("categories")
+}
+
+model Review {
+  id              String   @id @default(uuid())
+  rating          Int      
+  comment         String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  tenantId        String
+  tenant          User          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  propertyId      String
+  property        Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  rentalRequestId String        @unique
+  rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([tenantId])
+  @@map("reviews")
 }
