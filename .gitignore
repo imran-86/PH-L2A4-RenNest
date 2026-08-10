@@ -2,3 +2,7 @@ node_modules
 /generated/prisma
 dist
 .env
+.agent/
+.claude/
+.windsurf/
+.vercel
