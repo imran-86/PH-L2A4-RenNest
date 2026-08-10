@@ -10,6 +10,8 @@ import { rentalRequestRoutes } from "./modules/RentalRequest/rental_request.rout
 import { adminRoutes } from "./modules/admin/admin.route";
 import { paymentRoutes } from "./modules/payments/payment.route";
 import { reviewRoutes } from "./modules/review/review.router";
+import { notFoundRoute } from "./middlewares/notFoundRoute";
+import { globalErrorHandler } from "./middlewares/globalHandleErrors";
 
 const app : Application = express();
 
@@ -50,6 +52,10 @@ app.use("/api/landlord/requests",
 app.use("/api/admin",adminRoutes)
 app.use("/api/review",reviewRoutes)
 app.use("/api/reviews/property/history",landlordRoutes)
+
+app.use(notFoundRoute)
+
+app.use(globalErrorHandler)
 
 
 
